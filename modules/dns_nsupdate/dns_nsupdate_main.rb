@@ -9,12 +9,12 @@ module Proxy::Dns::Nsupdate
 
     def initialize(a_server, a_ttl, dns_key)
       @dns_key = dns_key
-      super(a_server, a_ttl)
+      super(a_server, a_ttl, true)
     end
 
     def do_create(id, value, type)
       nsupdate_connect
-      nsupdate "update add #{id}. #{@ttl} #{type} #{value}"
+      nsupdate "update add #{id} #{@ttl} #{type} #{value}"
       nsupdate_disconnect
       nil
     ensure
