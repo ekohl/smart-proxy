@@ -11,11 +11,12 @@ module Proxy::Dns
     include ::Proxy::Log
     include ::Proxy::Dns::Resolver
 
-    attr_reader :server, :ttl
+    attr_reader :server, :ttl, :absolute_records
 
-    def initialize(server = nil, ttl = nil)
-      @server = server || "localhost"
-      @ttl    = ttl || "86400"
+    def initialize(server = nil, ttl = nil, absolute_records = false)
+      @server           = server || "localhost"
+      @ttl              = ttl || "86400"
+      @absolute_records = absolute_records
     end
 
     def resolver
@@ -29,7 +30,7 @@ module Proxy::Dns
         when 0 then
           return nil
         else
-          do_create(fqdn, ip, "A")
+          do_create(absolute_name(fqdn), ip, "A")
       end
     end
 
@@ -40,7 +41,7 @@ module Proxy::Dns
         when 0 then
           return nil
         else
-          do_create(fqdn, ip, "AAAA")
+          do_create(absolute_name(fqdn), ip, "AAAA")
       end
     end
 
@@ -51,7 +52,7 @@ module Proxy::Dns
         when 0 then
           return nil
         else
-          do_create(fqdn, target, "CNAME")
+          do_create(absolute_name(fqdn), absolute_name(target), "CNAME")
       end
     end
 
@@ -62,7 +63,7 @@ module Proxy::Dns
         when 0
           return nil
         else
-          do_create(ptr, fqdn, "PTR")
+          do_create(absolute_name(ptr), absolute_name(fqdn), "PTR")
       end
     end
 
@@ -71,19 +72,19 @@ module Proxy::Dns
     end
 
     def remove_a_record(fqdn)
-      do_remove(fqdn, "A")
+      do_remove(absolute_name(fqdn), "A")
     end
 
     def remove_aaaa_record(fqdn)
-      do_remove(fqdn, "AAAA")
+      do_remove(absolute_name(fqdn), "AAAA")
     end
 
     def remove_cname_record(fqdn)
-      do_remove(fqdn, "CNAME")
+      do_remove(absolute_name(fqdn), "CNAME")
     end
 
     def remove_ptr_record(name)
-      do_remove(name, "PTR")
+      do_remove(absolute_name(name), "PTR")
     end
 
     def do_remove(name, type)
@@ -137,6 +138,10 @@ module Proxy::Dns
       return -1 if resources.empty?
       return 0 if resources.any? {|r| r.name.to_s.casecmp(content) == 0 }
       1
+    end
+
+    def absolute_name(name)
+      @absolute_records ? name + '.' : name
     end
   end
 end
