@@ -1,5 +1,6 @@
 require 'resolv'
 require 'ipaddr'
+require 'dns_common/dns_resolver.rb'
 
 module Proxy::Dns
   class Error < RuntimeError; end
@@ -8,6 +9,7 @@ module Proxy::Dns
 
   class Record
     include ::Proxy::Log
+    include ::Proxy::Dns::Resolver
 
     attr_reader :server, :ttl
 
@@ -86,64 +88,6 @@ module Proxy::Dns
 
     def do_remove(name, type)
       raise(Proxy::Dns::Error, "Deletion of #{type} not implemented")
-    end
-
-    def dns_find(key)
-      logger.warn(%q{Proxy::Dns::Record#dns_find has been deprecated and will be removed in future versions of Smart-Proxy.
-                      Please use ::Proxy::Dns::Record#get_name or ::Proxy::Dns::Record#get_address instead.})
-      if key =~ /\.in-addr\.arpa$/ || key =~ /\.ip6\.arpa$/
-        get_name(key)
-      else
-        resolver.getaddress(key).to_s
-      end
-    rescue Resolv::ResolvError
-      false
-    end
-
-    def get_name(a_ptr)
-      get_resource_as_string(a_ptr, Resolv::DNS::Resource::IN::PTR, :name)
-    end
-
-    def get_name!(a_ptr)
-      get_resource_as_string!(a_ptr, Resolv::DNS::Resource::IN::PTR, :name)
-    end
-
-    def get_ipv4_address!(fqdn)
-      get_resource_as_string!(fqdn, Resolv::DNS::Resource::IN::A, :address)
-    end
-
-    def get_ipv4_address(fqdn)
-      get_resource_as_string(fqdn, Resolv::DNS::Resource::IN::A, :address)
-    end
-
-    def get_ipv6_address!(fqdn)
-      get_resource_as_string!(fqdn, Resolv::DNS::Resource::IN::AAAA, :address)
-    end
-
-    def get_ipv6_address(fqdn)
-      get_resource_as_string(fqdn, Resolv::DNS::Resource::IN::AAAA, :address)
-    end
-
-    def get_resource_as_string(value, resource_type, attr)
-      resolver.getresource(value, resource_type).send(attr).to_s
-    rescue Resolv::ResolvError
-      false
-    end
-
-    def get_resource_as_string!(value, resource_type, attr)
-      resolver.getresource(value, resource_type).send(attr).to_s
-    rescue Resolv::ResolvError
-      raise Proxy::Dns::NotFound.new("Cannot find DNS entry for #{value}")
-    end
-
-    def ptr_to_ip ptr
-     if ptr =~ /\.in-addr\.arpa$/
-       ptr.split('.')[0..-3].reverse.join('.')
-     elsif ptr =~ /\.ip6\.arpa$/
-       ptr.split('.')[0..-3].reverse.each_slice(4).inject([]) {|address, word| address << word.join}.join(":")
-     else
-       raise Proxy::Dns::Error.new("Not a PTR address: '#{ptr}'")
-     end
     end
 
     # conflict methods return values:
