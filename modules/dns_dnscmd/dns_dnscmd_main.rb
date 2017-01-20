@@ -6,21 +6,20 @@ module Proxy::Dns::Dnscmd
     include Proxy::Util
 
     def initialize(a_server, a_ttl)
-      super(a_server, a_ttl)
+      super(a_server, a_ttl, true)
     end
 
     def do_create(name, value, type)
       zone = match_zone(name, enum_zones)
       msg = "Added #{type} entry #{name} => #{value}"
-      value = "#{value}." if type == "PTR"
-      cmd = "/RecordAdd #{zone} #{name}. #{type} #{value}"
+      cmd = "/RecordAdd #{zone} #{name} #{type} #{value}"
       execute(cmd, msg)
       nil
     end
 
     def remove_specific_record_from_zone(zone_name, node_name, record, type)
       msg = "Removed #{record} #{type} record #{node_name} from #{zone_name}"
-      cmd = "/RecordDelete #{zone_name} #{node_name}. #{type} #{record} /f"
+      cmd = "/RecordDelete #{zone_name} #{node_name} #{type} #{record} /f"
       execute(cmd, msg)
       nil
     end
@@ -107,7 +106,7 @@ module Proxy::Dns::Dnscmd
 
     def enum_records(zone_name, node_name, type)
       records = []
-      response = execute "/EnumRecords #{zone_name} #{node_name}. /Type #{type}", "EnumRecords", true
+      response = execute "/EnumRecords #{zone_name} #{node_name} /Type #{type}", "EnumRecords", true
       response.each do |line|
         line.chomp!
         logger.debug "Extracting record from dnscmd output '#{line}'"
