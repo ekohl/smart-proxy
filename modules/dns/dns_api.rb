@@ -9,6 +9,55 @@ module Proxy::Dns
     authorize_with_trusted_hosts
     authorize_with_ssl_client
 
+    get '/domains/?' do
+      content_type :json
+      server.list_domains.to_json
+    rescue NotImplementedError => e
+      log_halt 501, e
+    end
+
+    post '/domains/?' do
+      name = params[:name]
+      validate_dns_name!(name)
+
+      content_type :json
+      server.create_domain(name).to_json
+    rescue Proxy::Dns::Error => e
+      log_halt 400, e
+    rescue Proxy::Dns::Collision => e
+      log_halt 409, e
+    rescue NotImplementedError => e
+      log_halt 501, e
+    end
+
+    get '/domains/:name' do
+      name = params[:name]
+      validate_dns_name!(name)
+
+      content_type :json
+      server.get_domain(name).to_json
+    rescue Proxy::Dns::Error => e
+      log_halt 400, e
+    rescue Proxy::Dns::NotFound => e
+      log_halt 404, e
+    rescue NotImplementedError => e
+      log_halt 501, e
+    end
+
+    delete '/domains/:name' do
+      name = params[:name]
+      validate_dns_name!(name)
+
+      server.delete_domain(name)
+      nil
+    rescue Proxy::Dns::Error => e
+      log_halt 400, e
+    rescue Proxy::Dns::Collision => e
+      log_halt 409, e
+    rescue NotImplementedError => e
+      log_halt 501, e
+    end
+
     post "/?" do
       fqdn = params[:fqdn]
       value = params[:value]

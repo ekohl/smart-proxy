@@ -23,6 +23,22 @@ module Proxy::Dns
       dns_resolv(:nameserver => override_nameserver)
     end
 
+    def create_domain(name)
+      raise NotImplementedError, 'Managing domains is not implemented by the provider'
+    end
+
+    def delete_domain(name)
+      raise NotImplementedError, 'Managing domains is not implemented by the provider'
+    end
+
+    def get_domain(name)
+      raise NotImplementedError, 'Managing domains is not implemented by the provider'
+    end
+
+    def list_domains
+      raise NotImplementedError, 'Managing domains is not implemented by the provider'
+    end
+
     def create_srv_record(service, value)
       do_create(service, value, 'SRV')
     end
