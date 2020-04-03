@@ -70,7 +70,6 @@ module Proxy
   require 'puppet_proxy/puppet'
   require 'puppet_proxy_customrun/puppet_proxy_customrun'
   require 'puppet_proxy_mcollective/puppet_proxy_mcollective'
-  require 'puppet_proxy_puppet_api/puppet_proxy_puppet_api'
   require 'puppet_proxy_salt/puppet_proxy_salt'
   require 'puppet_proxy_ssh/puppet_proxy_ssh'
   require 'bmc/bmc'

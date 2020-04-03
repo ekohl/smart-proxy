@@ -23,13 +23,6 @@ class ProxyPuppetMigrationTest < Test::Unit::TestCase
     assert_equal [:puppet, :use_provider, 'puppet_proxy_salt'], @migration.remap_parameter(:puppet_provider, 'salt').flatten
   end
 
-  def test_puppet_api_parameter_mapping
-    assert_equal [:puppet_proxy_puppet_api, :puppet_url, 'http://localhost'], @migration.remap_parameter(:puppet_url, "http://localhost").last
-    assert_equal [:puppet_proxy_puppet_api, :puppet_ssl_ca, 'some/path'], @migration.remap_parameter(:puppet_ssl_ca, "some/path").last
-    assert_equal [:puppet_proxy_puppet_api, :puppet_ssl_cert, 'some/path'], @migration.remap_parameter(:puppet_ssl_cert, "some/path").last
-    assert_equal [:puppet_proxy_puppet_api, :puppet_ssl_key, 'some/path'], @migration.remap_parameter(:puppet_ssl_key, "some/path").last
-  end
-
   def test_puppet_ssh_parameter_mapping
     assert_equal [:puppet_proxy_ssh, :use_sudo, true], @migration.remap_parameter(:puppetssh_sudo, true).flatten
     assert_equal [:puppet_proxy_ssh, :command, "command"], @migration.remap_parameter(:puppetssh_command, "command").flatten
@@ -71,7 +64,7 @@ class ProxyPuppetMigrationTest < Test::Unit::TestCase
   end
 
   def test_migrate_puppet_configuration
-    assert_equal({:puppet => {:enabled => true}, :puppet_proxy_puppet_api => {:puppet_url => "http://localhost"}},
+    assert_equal({:puppet => {:enabled => true, :puppet_url => "http://localhost"}},
                  @migration.migrate_puppet_configuration(:enabled => true, :puppet_url => "http://localhost"))
   end
 end
