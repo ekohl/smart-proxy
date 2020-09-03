@@ -1,6 +1,4 @@
 require 'test_helper'
-require 'puppet_proxy/environment'
-require 'puppet_proxy/errors'
 require 'puppet_proxy/v3_environments_retriever'
 
 class PuppetV3EnvironmentsRetrieverTest < Test::Unit::TestCase

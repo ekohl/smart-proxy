@@ -1,4 +1,5 @@
 require 'puppet_proxy_common/api_request'
+require 'puppet_proxy/errors'
 
 module Proxy::Puppet
   class Apiv3 < ::Proxy::Puppet::ApiRequest

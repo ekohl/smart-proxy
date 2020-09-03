@@ -1,5 +1,8 @@
 require 'concurrent'
 
+require 'puppet_proxy/errors'
+require 'puppet_proxy/puppet_class'
+
 class Proxy::Puppet::V3EnvironmentClassesApiClassesRetriever
   include ::Proxy::Log
 
@@ -8,7 +11,7 @@ class Proxy::Puppet::V3EnvironmentClassesApiClassesRetriever
 
   attr_reader :puppet_url, :ssl_ca, :ssl_cert, :ssl_key, :api_timeout
 
-  def initialize(puppet_url, puppet_ssl_ca, puppet_ssl_cert, puppet_ssl_key, api_timeout, api = nil)
+  def initialize(puppet_url, puppet_ssl_ca, puppet_ssl_cert, puppet_ssl_key, api_timeout, api)
     @etag_cache = {}
     @classes_cache = {}
     @futures_cache = {}
@@ -18,7 +21,7 @@ class Proxy::Puppet::V3EnvironmentClassesApiClassesRetriever
     @puppet_url = puppet_url
     @api_timeout = api_timeout
     @m = Monitor.new
-    @puppet_api = api || Proxy::Puppet::Apiv3
+    @puppet_api = api
   end
 
   def classes_in_environment(environment)

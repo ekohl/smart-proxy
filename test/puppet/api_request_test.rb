@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'puppet_proxy_common/api_request'
 require 'puppet_proxy/apiv3'
 require 'webmock/test_unit'
 

@@ -1,20 +1,6 @@
 require 'test_helper'
 require 'puppet_proxy/puppet'
 
-class PuppetConfigurationTest < Test::Unit::TestCase
-  def setup
-    @configuration = ::Proxy::Puppet::ConfigurationLoader.new
-  end
-
-  def test_load_programmable_settings_sets_classes_retriever
-    assert_equal :apiv3, @configuration.load_programmable_settings({})[:classes_retriever]
-  end
-
-  def test_load_programmable_settings_sets_environments_retriever
-    assert_equal :apiv3, @configuration.load_programmable_settings({})[:environments_retriever]
-  end
-end
-
 class PuppetDefaultSettingsTest < Test::Unit::TestCase
   def test_default_settings
     Proxy::Puppet::Plugin.load_test_settings({})

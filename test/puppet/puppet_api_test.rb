@@ -3,10 +3,9 @@ require 'json'
 require 'puppet_proxy/puppet_class'
 require 'puppet_proxy/environment'
 require 'puppet_proxy/errors'
+require 'puppet_proxy/v3_environments_retriever'
 
 class ApiTestEnvironmentsRetriever < ::Proxy::Puppet::V3EnvironmentsRetriever
-  attr_reader :first, :second
-
   def initialize
     @first = ::Proxy::Puppet::Environment.new("first", ["path1", "path2"])
     @second = ::Proxy::Puppet::Environment.new("second", ["path3", "path4"])
@@ -18,23 +17,16 @@ class ApiTestEnvironmentsRetriever < ::Proxy::Puppet::V3EnvironmentsRetriever
 end
 
 class ApiTestClassesRetriever
-  attr_reader :class_one, :class_two, :classes_and_errors_response
-
   def initialize
-    @class_one = ::Proxy::Puppet::PuppetClass.new("dns::install")
-    @class_two = ::Proxy::Puppet::PuppetClass.new("dns", "dns_server_package" => "${::dns::params::dns_server_package}")
-    @classes_and_errors_response =
-      [
-        {"classes" => [{"name" => "dns::config", "params" => []}], "path" => "/manifests/config.pp"},
-        { "classes" => [{"name" => "dns::install", "params" => []}], "path" => "/manifests/install.pp"},
-        {"error" => "Syntax error at '=>' at /manifests/witherror.pp:20:19", "path" => "/manifests/witherror.pp"},
-      ]
   end
 
   def classes_in_environment(an_environment)
     case an_environment
       when 'first'
-        [@class_one, @class_two]
+        [
+          ::Proxy::Puppet::PuppetClass.new("dns::install"),
+          ::Proxy::Puppet::PuppetClass.new("dns", "dns_server_package" => "${::dns::params::dns_server_package}"),
+        ]
       when 'second'
         raise Proxy::Puppet::EnvironmentNotFound.new
       else
@@ -44,10 +36,14 @@ class ApiTestClassesRetriever
 
   def classes_and_errors_in_environment(an_environment)
     case an_environment
-      when 'first'
-        @classes_and_errors_response
-      else
-        raise Proxy::Puppet::EnvironmentNotFound
+    when 'first'
+      [
+        {"classes" => [{"name" => "dns::config", "params" => []}], "path" => "/manifests/config.pp"},
+        {"classes" => [{"name" => "dns::install", "params" => []}], "path" => "/manifests/install.pp"},
+        {"error" => "Syntax error at '=>' at /manifests/witherror.pp:20:19", "path" => "/manifests/witherror.pp"},
+      ]
+    else
+      raise Proxy::Puppet::EnvironmentNotFound
     end
   end
 end
@@ -71,32 +67,22 @@ ENV['RACK_ENV'] = 'test'
 class PuppetTest < Test::Unit::TestCase
   include Rack::Test::Methods
 
-  def setup
-    @class_retriever = ApiTestClassesRetriever.new
-    @environment_retriever = ApiTestEnvironmentsRetriever.new
-
-    @class_one = @class_retriever.class_one
-    @class_two = @class_retriever.class_two
-    @classes_and_errors_response = @class_retriever.classes_and_errors_response
-  end
-
   def app
-    app = Proxy::Puppet::Api.new
-    app
+    Proxy::Puppet::Api.new
   end
 
   def test_gets_puppet_environments
     get "/environments"
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
-    assert_equal [@environment_retriever.first.name, @environment_retriever.second.name], JSON.parse(last_response.body)
+    assert_equal ['first', 'second'], JSON.parse(last_response.body)
   end
 
   def test_gets_single_puppet_environment
-    get "/environments/#{@environment_retriever.first.name}"
+    get '/environments/first'
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
     data = JSON.parse(last_response.body)
-    assert_equal @environment_retriever.first.name, data["name"]
-    assert_equal @environment_retriever.first.paths, data["paths"]
+    assert_equal 'first', data["name"]
+    assert_equal ['path1', 'path2'], data["paths"]
   end
 
   def test_missing_single_puppet_environment
@@ -109,8 +95,9 @@ class PuppetTest < Test::Unit::TestCase
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
     data = JSON.parse(last_response.body)
 
-    assert_equal({'name' => @class_one.name, 'module' => @class_one.module, 'params' => @class_one.params}, data[0]["dns::install"])
-    assert_equal({'name' => @class_two.name, 'module' => @class_two.module, 'params' => @class_two.params}, data[1]["dns"])
+    assert_equal({'name' => 'install', 'module' => 'dns', 'params' => {}}, data[0]["dns::install"])
+    expected_params = { 'dns_server_package' => '${::dns::params::dns_server_package}' }
+    assert_equal({'name' => 'dns', 'module' => nil, 'params' => expected_params}, data[1]["dns"])
   end
 
   def test_gets_environment_classes_and_errors
@@ -118,7 +105,13 @@ class PuppetTest < Test::Unit::TestCase
     assert last_response.ok?, "Last response was not ok: #{last_response.body}"
     data = JSON.parse(last_response.body)
 
-    assert_equal @classes_and_errors_response, data
+    expected = [
+      {"classes" => [{"name" => "dns::config", "params" => []}], "path" => "/manifests/config.pp"},
+      {"classes" => [{"name" => "dns::install", "params" => []}], "path" => "/manifests/install.pp"},
+      {"error" => "Syntax error at '=>' at /manifests/witherror.pp:20:19", "path" => "/manifests/witherror.pp"},
+    ]
+
+    assert_equal expected, data
   end
 
   def test_get_puppet_class_from_non_existing_environment

@@ -1,3 +1,6 @@
+require 'puppet_proxy/environment'
+require 'puppet_proxy/errors'
+
 module Proxy::Puppet
   class V3EnvironmentsRetriever
     def initialize(api)

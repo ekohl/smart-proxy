@@ -1,12 +1,8 @@
 module ::Proxy::Puppet
   class ConfigurationLoader
     def load_classes
-      require 'puppet_proxy/errors'
       require 'puppet_proxy/dependency_injection'
       require 'puppet_proxy/puppet_api'
-      require 'puppet_proxy/environment'
-      require 'puppet_proxy/puppet_class'
-      require 'puppet_proxy_common/api_request'
       require 'puppet_proxy/apiv3'
       require 'puppet_proxy/v3_environments_retriever'
       require 'puppet_proxy/v3_environment_classes_api_classes_retriever'
@@ -30,7 +26,8 @@ module ::Proxy::Puppet
                                                    settings[:puppet_ssl_ca],
                                                    settings[:puppet_ssl_cert],
                                                    settings[:puppet_ssl_key],
-                                                   settings[:api_timeout])
+                                                   settings[:api_timeout],
+                                                   Proxy::Puppet::Apiv3)
                                                end)
     end
   end
