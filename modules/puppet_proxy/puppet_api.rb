@@ -24,8 +24,7 @@ class Proxy::Puppet::Api < ::Sinatra::Base
   get "/environments/:environment" do
     content_type :json
     begin
-      env = environment_retriever.get(params[:environment])
-      {:name => env.name, :paths => env.paths}.to_json
+      environment_retriever.get(params[:environment]).to_json
     rescue Proxy::Puppet::EnvironmentNotFound
       log_halt 404, "Could not find environment '#{params[:environment]}'"
     rescue => e

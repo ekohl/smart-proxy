@@ -7,6 +7,10 @@ module Proxy::Puppet
       @paths = paths
     end
 
+    def to_json
+      {name: name, paths: paths}.to_json
+    end
+
     def to_s
       name
     end
