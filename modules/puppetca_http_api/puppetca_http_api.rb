@@ -1,2 +1,0 @@
-require 'puppetca_http_api/plugin_configuration'
-require 'puppetca_http_api/puppetca_http_api_plugin'

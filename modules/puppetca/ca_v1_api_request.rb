@@ -1,6 +1,6 @@
 require 'puppet_proxy_common/api_request'
 
-module ::Proxy::PuppetCa::PuppetcaHttpApi
+module ::Proxy::PuppetCa
   class CaApiv1Request < ::Proxy::Puppet::ApiRequest
     # the key is required but ignored
     def search(key = 'foreman')

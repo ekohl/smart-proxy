@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'puppetca/puppetca'
 require 'puppetca/dependency_injection'
-require 'puppetca_http_api/puppetca_impl'
+require 'puppetca/puppetca_impl'
 
 class PuppetCaHttpImplTest < Test::Unit::TestCase
   class FakeCaApiV1Request
@@ -77,7 +77,7 @@ class PuppetCaHttpImplTest < Test::Unit::TestCase
   end
 
   def setup
-    @api = Proxy::PuppetCa::PuppetcaHttpApi::PuppetcaImpl.new
+    @api = Proxy::PuppetCa::PuppetcaImpl.new
     client = FakeCaApiV1Request.new
     @api.stubs(:client).returns(client)
   end

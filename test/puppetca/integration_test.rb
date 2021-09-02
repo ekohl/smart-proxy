@@ -3,7 +3,6 @@ require 'json'
 require 'root/root_v2_api'
 require 'puppetca/puppetca'
 require 'puppetca_hostname_whitelisting/puppetca_hostname_whitelisting'
-require 'puppetca_http_api/puppetca_http_api'
 
 class PuppetcaApiFeaturesTest < Test::Unit::TestCase
   include Rack::Test::Methods
@@ -19,14 +18,14 @@ class PuppetcaApiFeaturesTest < Test::Unit::TestCase
     ssl_key = Tempfile.new('ssl_key')
 
     begin
-      Proxy::DefaultModuleLoader.any_instance.expects(:load_configuration_file).with('puppetca.yml').returns(enabled: true)
-      Proxy::DefaultModuleLoader.any_instance.expects(:load_configuration_file).with('puppetca_hostname_whitelisting.yml').returns({})
-      Proxy::DefaultModuleLoader.any_instance.expects(:load_configuration_file).with('puppetca_http_api.yml').returns(
+      Proxy::DefaultModuleLoader.any_instance.expects(:load_configuration_file).with('puppetca.yml').returns(
+        enabled: true,
         puppet_url: 'https://puppet.example.com:8140',
         puppet_ssl_ca: ssl_ca.path,
         puppet_ssl_cert: ssl_cert.path,
         puppet_ssl_key: ssl_key.path
       )
+      Proxy::DefaultModuleLoader.any_instance.expects(:load_configuration_file).with('puppetca_hostname_whitelisting.yml').returns({})
 
       get '/features'
 
@@ -37,7 +36,7 @@ class PuppetcaApiFeaturesTest < Test::Unit::TestCase
       assert_equal('running', mod['state'], Proxy::LogBuffer::Buffer.instance.info[:failed_modules][:puppetca])
       assert_equal([], mod['capabilities'])
 
-      expected_settings = {'use_provider' => ['puppetca_hostname_whitelisting', 'puppetca_http_api'], 'puppet_url' => 'https://puppet.example.com:8140'}
+      expected_settings = {'use_provider' => 'puppetca_hostname_whitelisting', 'puppet_url' => 'https://puppet.example.com:8140'}
       assert_equal(expected_settings, mod['settings'])
     ensure
       ssl_ca.unlink

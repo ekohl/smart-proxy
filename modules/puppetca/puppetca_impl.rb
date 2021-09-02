@@ -1,4 +1,4 @@
-module ::Proxy::PuppetCa::PuppetcaHttpApi
+module ::Proxy::PuppetCa
   class PuppetcaImpl
     extend Proxy::PuppetCa::DependencyInjection
     inject_attr :http_api_impl, :client
