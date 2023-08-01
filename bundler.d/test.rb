@@ -4,12 +4,14 @@ group :test do
   gem 'test-unit'
   gem 'benchmark-ips'
   gem 'ruby-prof', '< 1.4'
-  gem 'rubocop', '~> 1.28.0'
-  gem 'rubocop-performance', '~> 1.5.2'
   gem 'rack-test'
   gem 'rake'
-  gem 'rubocop-checkstyle_formatter', '~> 0.2'
   gem 'webmock'
+
+  # RuboCop
+  gem 'rubocop', '~> 1.55.0'
+  gem 'rubocop-rake', '~> 0.6.0'
+  gem 'rubocop-performance', '~> 1.18'
 
   # Technically this is a hard dependency of the facts module but that's only
   # used in discovery. This at least allows us to run the tests on it
