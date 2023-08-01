@@ -22,7 +22,7 @@ class HttpbootApiTest < Test::Unit::TestCase
   end
 
   def teardown
-    FileUtils.rm_rf(@tempdir) if @tempdir =~ /httpboot-test/
+    FileUtils.rm_rf(@tempdir) if @tempdir
   end
 
   def test_valid_file
@@ -56,13 +56,12 @@ class HttpbootApiTest < Test::Unit::TestCase
   end
 
   def test_dangerous_symlink
-    another_dir = Dir.mktmpdir 'httpboot-test2'
-    FileUtils.touch "#{another_dir}/secure_file"
-    FileUtils.ln_s "#{another_dir}/secure_file", "#{@tempdir}/dangerous_symlink"
-    result = get "/dangerous_symlink"
-    assert_equal 403, last_response.status
-    assert_equal 'Invalid or empty path', result.body
-  ensure
-    FileUtils.rm_rf(another_dir) if another_dir =~ /httpboot-test/
+    Dir.mktmpdir 'httpboot-test2' do |another_dir|
+      FileUtils.touch "#{another_dir}/secure_file"
+      FileUtils.ln_s "#{another_dir}/secure_file", "#{@tempdir}/dangerous_symlink"
+      result = get "/dangerous_symlink"
+      assert_equal 403, last_response.status
+      assert_equal 'Invalid or empty path', result.body
+    end
   end
 end
