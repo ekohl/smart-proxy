@@ -59,7 +59,7 @@ module Proxy::FreeIPARealm
     def find(hostname)
       ipa_call("host_show", [hostname])
     rescue XMLRPC::FaultException => e
-      if e.message =~ /not found/
+      if e.message.include?('not found')
         nil
       else
         raise
@@ -83,7 +83,7 @@ module Proxy::FreeIPARealm
 
       JSON.pretty_generate(result["result"])
     rescue => e
-      if e.message =~ /no modifications/
+      if e.message.include?('no modifications')
         JSON.pretty_generate("message" => "nothing to do")
       else
         raise

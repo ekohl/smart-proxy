@@ -5,10 +5,10 @@ class Proxy::SignalHandler
 
   def self.install_traps
     handler = new
-    handler.install_ttin_trap unless RUBY_PLATFORM =~ /mingw/
+    handler.install_ttin_trap unless RUBY_PLATFORM.include?('mingw')
     handler.install_int_trap
     handler.install_term_trap
-    handler.install_usr1_trap unless RUBY_PLATFORM =~ /mingw/
+    handler.install_usr1_trap unless RUBY_PLATFORM.include?('mingw')
   end
 
   def install_ttin_trap

@@ -56,7 +56,7 @@ module Proxy::Helpers
     # by default the content type will probably be set to "application/x-www-form-urlencoded" unless the
     # user changed it.  If the user doesn't specify the content type we just ignore the body since a form
     # will be parsed into the request.params object for us by sinatra
-    if request.env["CONTENT_TYPE"] =~ /application\/json/
+    if request.env["CONTENT_TYPE"]&.include?('application/json')
       begin
         body_parameters = request.body.read
         json_data = JSON.parse(body_parameters)

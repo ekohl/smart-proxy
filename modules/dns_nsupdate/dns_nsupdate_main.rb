@@ -51,7 +51,7 @@ module Proxy::Dns::Nsupdate
       @om.close
       @om = nil # we cannot serialize an IO object, even if closed.
       # TODO Parse output for errors!
-      if !status.empty? && status[1] !~ /status: NOERROR/
+      if !status.empty? && !status[1]&.include?('status: NOERROR')
         logger.debug "nsupdate: errors\n" + status.join("\n")
         raise Proxy::Dns::Error.new("Update errors: #{status.join("\n")}")
       end

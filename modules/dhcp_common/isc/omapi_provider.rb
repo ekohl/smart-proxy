@@ -158,7 +158,7 @@ module Proxy::DHCP::CommonISC
         end
       end
 
-      statements << 'vendor-option-space SUNW;' if statements.join(' ') =~ /SUNW/
+      statements << 'vendor-option-space SUNW;' if statements.join(' ').include?('SUNW')
 
       statements
     end

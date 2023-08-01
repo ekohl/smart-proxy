@@ -66,7 +66,7 @@ opts.each do |opt, arg|
 end
 
 unless key && cert && ca
-  if RUBY_PLATFORM =~ /mingw/
+  if RUBY_PLATFORM.include?('mingw')
     origin = Pathname.new(__dir__).parent.join "config"
     key  ||= origin.join "private.pem"
     cert ||= origin.join "signed.pem"

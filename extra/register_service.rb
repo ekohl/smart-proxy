@@ -1,4 +1,4 @@
-if RUBY_PLATFORM !~ /mingw/
+if !RUBY_PLATFORM.include?('mingw')
   puts "To install this service on Unix please create a startup script"
   exit
 end
