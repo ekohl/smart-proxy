@@ -6,6 +6,8 @@ require 'dns_libvirt/dns_libvirt'
 
 class DnsLibvirtApiFeaturesTest < SmartProxyRootApiTestCase
   def test_features
+    omit_unless(HAS_LIBVIRT, 'No libvirt installed')
+
     Proxy::DefaultModuleLoader.any_instance.expects(:load_configuration_file).with('dns.yml').returns(enabled: true, use_provider: 'dns_libvirt')
     Proxy::DefaultModuleLoader.any_instance.expects(:load_configuration_file).with('dns_libvirt.yml').returns(network: 'default')
 

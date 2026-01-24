@@ -1,9 +1,13 @@
 require 'test_helper'
 require 'ostruct'
-require 'dns_libvirt/libvirt_dns_network'
+if HAS_LIBVIRT
+  require 'dns_libvirt/libvirt_dns_network'
+end
 
 class LibvirtDNSNetworkTest < Test::Unit::TestCase
   def setup
+    omit_unless(HAS_LIBVIRT, 'No libvirt installed')
+
     @connection = mock()
     @network = mock()
     @connection.stubs(:lookup_network_by_name).returns(@network)

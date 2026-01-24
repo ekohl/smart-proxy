@@ -1,9 +1,13 @@
 require 'test_helper'
 require 'ostruct'
-require 'dhcp_libvirt/libvirt_dhcp_network'
+if HAS_LIBVIRT
+  require 'dhcp_libvirt/libvirt_dhcp_network'
+end
 
 class LibvirtDHCPNetworkTest < Test::Unit::TestCase
   def setup
+    omit_unless(HAS_LIBVIRT, 'No libvirt installed')
+
     @connection = mock()
     @network = mock()
     @connection.stubs(:lookup_network_by_name).returns(@network)

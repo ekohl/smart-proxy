@@ -6,6 +6,12 @@ require 'realm_freeipa/realm_freeipa'
 
 class RealmFreeipaApiFeaturesTest < SmartProxyRootApiTestCase
   def test_features
+    begin
+      require 'rkerberos'
+    rescue LoadError
+      omit('No rkeberos installed')
+    end
+
     keytab = Tempfile.new('keytab')
     ipa_config = Tempfile.new('ipa_config')
 

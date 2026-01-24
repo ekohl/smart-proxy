@@ -3,7 +3,9 @@ require 'dns_common/dns_common'
 require 'dns_nsupdate/dns_nsupdate'
 require 'dns_nsupdate/dns_nsupdate_main'
 require 'dns_nsupdate/dns_nsupdate_gss'
-require 'dns_nsupdate/dns_nsupdate_gss_main'
+if HAS_RKERBEROS
+  require 'dns_nsupdate/dns_nsupdate_gss_main'
+end
 
 class DnsNsupdateConfigTest < Test::Unit::TestCase
   def test_nsupdate_default_settings
@@ -42,6 +44,8 @@ end
 
 class DnsNsupdateGSSWiringTest < Test::Unit::TestCase
   def setup
+    omit_unless(HAS_RKERBEROS, 'No rkerberos installed')
+
     @container = ::Proxy::DependencyInjection::Container.new
     @config = ::Proxy::Dns::NsupdateGSS::PluginConfiguration.new
   end

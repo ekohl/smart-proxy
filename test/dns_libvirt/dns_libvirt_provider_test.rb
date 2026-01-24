@@ -1,10 +1,14 @@
 require 'test_helper'
-require 'dns_libvirt/plugin_configuration'
-require 'dns_libvirt/dns_libvirt_plugin'
-require 'dns_libvirt/dns_libvirt_main'
+if HAS_LIBVIRT
+  require 'dns_libvirt/plugin_configuration'
+  require 'dns_libvirt/dns_libvirt_plugin'
+  require 'dns_libvirt/dns_libvirt_main'
+end
 
 class DnsLibvirtProviderTest < Test::Unit::TestCase
   def setup
+    omit_unless(HAS_LIBVIRT, 'No libvirt installed')
+
     fixture = <<~XMLFIXTURE
       <network>
         <name>default</name>

@@ -3,6 +3,8 @@ require 'dhcp_libvirt/dhcp_libvirt_main'
 
 class LibvirtDhcpProviderInterfaceTest < Test::Unit::TestCase
   def test_provider_interface
+    omit_unless(HAS_LIBVIRT, 'No libvirt installed')
+
     ::Libvirt.stubs(:open).returns(true)
     assert_dhcp_provider_interface(::Proxy::DHCP::Libvirt::Provider.new(nil, nil, nil, nil))
   end

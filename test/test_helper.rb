@@ -2,6 +2,21 @@ require 'English'
 require "test/unit"
 require 'fileutils'
 
+# TODO: is there a better way to determine if the bundler groups are present?
+begin
+  require 'rkerberos'
+  HAS_RKERBEROS = true
+rescue LoadError
+  HAS_RKERBEROS = false
+end
+
+begin
+  require 'libvirt'
+  HAS_LIBVIRT = true
+rescue LoadError
+  HAS_LIBVIRT = false
+end
+
 $LOAD_PATH << File.join(__dir__, '..', 'lib')
 $LOAD_PATH << File.join(__dir__, '..', 'modules')
 

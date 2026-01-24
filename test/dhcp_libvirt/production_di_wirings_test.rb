@@ -1,12 +1,16 @@
 require 'test_helper'
 require 'dhcp_common/subnet_service'
 require 'dhcp_common/free_ips'
-require 'dhcp_libvirt/libvirt_dhcp_network'
-require 'dhcp_libvirt/dhcp_libvirt_main'
-require 'dhcp_libvirt/configuration_loader'
+if HAS_LIBVIRT
+  require 'dhcp_libvirt/libvirt_dhcp_network'
+  require 'dhcp_libvirt/dhcp_libvirt_main'
+  require 'dhcp_libvirt/configuration_loader'
+end
 
 class DhcpLibvirtProductionDIWiringsTest < Test::Unit::TestCase
   def setup
+    omit_unless(HAS_LIBVIRT, 'No libvirt installed')
+
     @settings = {:network => "a_network", :url => "qemu:///system"}
     @container = ::Proxy::DependencyInjection::Container.new
     ::Proxy::DHCP::Libvirt::PluginConfiguration.new.load_dependency_injection_wirings(@container, @settings)

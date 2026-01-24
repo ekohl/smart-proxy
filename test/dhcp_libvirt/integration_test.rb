@@ -6,6 +6,8 @@ require 'dhcp_libvirt/dhcp_libvirt'
 
 class DhcpLibvirtApiFeaturesTest < SmartProxyRootApiTestCase
   def test_features
+    omit_unless(HAS_LIBVIRT, 'No libvirt installed')
+
     Proxy::DefaultModuleLoader.any_instance.expects(:load_configuration_file).with('dhcp.yml').returns(enabled: true, use_provider: 'dhcp_libvirt')
     Proxy::DefaultModuleLoader.any_instance.expects(:load_configuration_file).with('dhcp_libvirt.yml').returns({})
 

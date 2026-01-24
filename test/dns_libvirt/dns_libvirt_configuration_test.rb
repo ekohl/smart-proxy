@@ -1,9 +1,13 @@
 require 'test_helper'
-require 'dns_libvirt/plugin_configuration'
-require 'dns_libvirt/dns_libvirt_main'
+if HAS_LIBVIRT
+  require 'dns_libvirt/plugin_configuration'
+  require 'dns_libvirt/dns_libvirt_main'
+end
 
 class DnsLibvirtConfigTest < Test::Unit::TestCase
   def test_default_settings
+    omit_unless(HAS_LIBVIRT, 'No libvirt installed')
+
     ::Proxy::Dns::Libvirt::Plugin.load_test_settings()
     assert_equal 'default', Proxy::Dns::Libvirt::Plugin.settings.network
   end
@@ -11,6 +15,8 @@ end
 
 class DnsLibvirtWiringTest < Test::Unit::TestCase
   def setup
+    omit_unless(HAS_LIBVIRT, 'No libvirt installed')
+
     @container = ::Proxy::DependencyInjection::Container.new
     @config = ::Proxy::Dns::Libvirt::PluginConfiguration.new
   end

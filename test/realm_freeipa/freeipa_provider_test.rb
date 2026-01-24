@@ -1,6 +1,8 @@
 require 'test_helper'
 require 'xmlrpc/client'
-require 'realm_freeipa/provider'
+if HAS_RKERBEROS
+  require 'realm_freeipa/provider'
+end
 
 class FreeIPATest < Test::Unit::TestCase
   class IpaConfigParserForTesting
@@ -25,6 +27,8 @@ class FreeIPATest < Test::Unit::TestCase
   end
 
   def setup
+    omit_unless(HAS_RKERBEROS, 'No rkerberos installed')
+
     @realm = 'test_realm'
     @ipa_config = IpaConfigParserForTesting.new('https://localhost', @realm)
     @provider = Proxy::FreeIPARealm::Provider.new(@ipa_config, 'keytab', 'prinicipal', true, true)
