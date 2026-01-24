@@ -9,10 +9,12 @@ class BmcTest < Test::Unit::TestCase
   end
 
   def test_sets_logger
-    log = Logger.new('/tmp/logtest.log')
-    log.level = Logger::INFO
-    Proxy::BMC::IPMI.logger = log
-    assert_equal log, Proxy::BMC::IPMI.logger
+    Tempfile.create do |f|
+      log = Logger.new(f.path)
+      log.level = Logger::INFO
+      Proxy::BMC::IPMI.logger = log
+      assert_equal log, Proxy::BMC::IPMI.logger
+    end
   end
 
   def test_creates_rubyipmi_object
